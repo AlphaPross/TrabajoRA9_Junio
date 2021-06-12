@@ -8,7 +8,7 @@ public class Leer {
 	
 	public String[][] LeerData() throws IOException {
 		// Leer archivo
-		String[][] listData = null;
+		String[][] listData = new String[999][999];
 		String[] listDataPre; 
 		int i = 0;
 		int y = 0;

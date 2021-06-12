@@ -40,23 +40,9 @@ public class Registro extends JFrame{
 	private JSeparator separator_7;
 	private JSeparator separator_8;
 	
-	/*public static void main(String[] args) {
-		
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Registro frame = new Registro();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-
-	}*/
-
 	public Registro() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
 		setBounds(100, 100, 450, 275);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -241,6 +227,7 @@ public class Registro extends JFrame{
 						try {
 							GestionCitas frame = new GestionCitas();
 							frame.setVisible(true);
+							frame.setLocationRelativeTo(null);
 							setVisible(false);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -266,6 +253,7 @@ public class Registro extends JFrame{
 						try {
 							Login frame = new Login();
 							frame.setVisible(true);
+							frame.setLocationRelativeTo(null);
 							setVisible(false);
 						} catch (Exception e) {
 							e.printStackTrace();

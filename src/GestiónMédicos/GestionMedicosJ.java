@@ -1,5 +1,6 @@
 package GestiónMédicos;
 
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,21 +12,37 @@ import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 
-import Guardar.Leer;
 import VerCitas.VerCitas;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 
-public class GestionMedicos extends JFrame{
-	
+public class GestionMedicosJ extends JFrame {
+
 	private JPanel contentPane;
-	private JTable table;
 
-	public GestionMedicos() throws IOException {
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					GestionMedicosJ frame = new GestionMedicosJ();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public GestionMedicosJ() throws IOException {
 		setTitle("Gesti\u00F3n M\u00E9dicos");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
@@ -81,12 +98,6 @@ public class GestionMedicos extends JFrame{
 		gbc_scrollPane.gridx = 2;
 		gbc_scrollPane.gridy = 2;
 		contentPane.add(scrollPane, gbc_scrollPane);
-		
-		Leer leer = new Leer();
-		table = new JTable();
-		table.setModel(new DefaultTableModel(leer.LeerData(),
-				new String[] { "Username", "Nombre", "Tel\u00E9fono", "Email", "Coches Totales" }));
-		scrollPane.setViewportView(table);
 		
 		JSeparator separator_4 = new JSeparator();
 		GridBagConstraints gbc_separator_4 = new GridBagConstraints();
@@ -149,5 +160,5 @@ public class GestionMedicos extends JFrame{
 		gbc_separator.gridy = 6;
 		contentPane.add(separator, gbc_separator);
 	}
-	
+
 }

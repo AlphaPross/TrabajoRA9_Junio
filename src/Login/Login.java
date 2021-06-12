@@ -1,6 +1,7 @@
 package Login;
 
 import java.awt.EventQueue;
+import services.Conexion;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -32,6 +33,7 @@ public class Login extends JFrame{
 				try {
 					Login frame = new Login();
 					frame.setVisible(true);
+					frame.setLocationRelativeTo(null);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -142,6 +144,7 @@ public class Login extends JFrame{
 							try {
 								GestionMedicos frame = new GestionMedicos();
 								frame.setVisible(true);
+								frame.setLocationRelativeTo(null);
 								setVisible(false);
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -156,6 +159,7 @@ public class Login extends JFrame{
 							try {
 								GestionCitas frame = new GestionCitas();
 								frame.setVisible(true);
+								frame.setLocationRelativeTo(null);
 								setVisible(false);
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -181,6 +185,7 @@ public class Login extends JFrame{
 						try {
 							Registro frame = new Registro();
 							frame.setVisible(true);
+							frame.setLocationRelativeTo(null);
 							setVisible(false);
 						} catch (Exception e) {
 							e.printStackTrace();
