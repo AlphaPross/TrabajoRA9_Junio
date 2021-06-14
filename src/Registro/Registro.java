@@ -1,5 +1,6 @@
 package Registro;
 
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -7,6 +8,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,12 +21,11 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import GestiónCitas.GestionCitas;
-import Guardar.Guardar;
 import Login.Login;
+import services.Conexion;
 
 public class Registro extends JFrame{
 
-	private JPanel contentPane;
 	private JTextField textField;
 	private JTextField textField_1;
 	private JTextField textField_2;
@@ -39,19 +42,24 @@ public class Registro extends JFrame{
 	private JSeparator separator_6;
 	private JSeparator separator_7;
 	private JSeparator separator_8;
+	private JSeparator separator_9;
+	private JTextField textField_5;
+	private JLabel lblNewLabel_5;
+	private JPanel contentPane;
 	
 	public Registro() {
+		setTitle("Registro Usuario");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		setBounds(100, 100, 450, 275);
+		setBounds(100, 100, 450, 290);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{28, 0, 16, 0, 141, 22, 0, 0};
-		gbl_contentPane.rowHeights = new int[]{19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gbl_contentPane.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		
 		separator = new JSeparator();
@@ -75,7 +83,7 @@ public class Registro extends JFrame{
 		gbc_separator_7.gridy = 1;
 		contentPane.add(separator_7, gbc_separator_7);
 		
-		JLabel lblNewLabel = new JLabel("Username");
+		JLabel lblNewLabel = new JLabel("DNI");
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
 		gbc_lblNewLabel.anchor = GridBagConstraints.WEST;
 		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
@@ -100,7 +108,7 @@ public class Registro extends JFrame{
 		gbc_separator_1.gridy = 2;
 		contentPane.add(separator_1, gbc_separator_1);
 		
-		JLabel lblNewLabel_1 = new JLabel("Password");
+		JLabel lblNewLabel_1 = new JLabel("Nombre");
 		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
 		gbc_lblNewLabel_1.anchor = GridBagConstraints.WEST;
 		gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
@@ -125,7 +133,7 @@ public class Registro extends JFrame{
 		gbc_separator_2.gridy = 4;
 		contentPane.add(separator_2, gbc_separator_2);
 		
-		JLabel lblNewLabel_2 = new JLabel("Repite Password");
+		JLabel lblNewLabel_2 = new JLabel("Fecha Nacimiento");
 		GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
 		gbc_lblNewLabel_2.anchor = GridBagConstraints.WEST;
 		gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
@@ -157,7 +165,7 @@ public class Registro extends JFrame{
 		gbc_separator_3.gridy = 6;
 		contentPane.add(separator_3, gbc_separator_3);
 		
-		JLabel lblNewLabel_3 = new JLabel("Tel\u00E9fono");
+		JLabel lblNewLabel_3 = new JLabel("Usuario");
 		GridBagConstraints gbc_lblNewLabel_3 = new GridBagConstraints();
 		gbc_lblNewLabel_3.anchor = GridBagConstraints.WEST;
 		gbc_lblNewLabel_3.insets = new Insets(0, 0, 5, 5);
@@ -182,7 +190,7 @@ public class Registro extends JFrame{
 		gbc_separator_4.gridy = 8;
 		contentPane.add(separator_4, gbc_separator_4);
 		
-		JLabel lblNewLabel_4 = new JLabel("Email");
+		JLabel lblNewLabel_4 = new JLabel("Contraseña");
 		GridBagConstraints gbc_lblNewLabel_4 = new GridBagConstraints();
 		gbc_lblNewLabel_4.anchor = GridBagConstraints.WEST;
 		gbc_lblNewLabel_4.insets = new Insets(0, 0, 5, 5);
@@ -211,15 +219,19 @@ public class Registro extends JFrame{
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
-				Guardar guardar = new Guardar();
-				String[]strings= {textField.getText()+";",textField_1.getText()+";",
-								textField_3.getText()+";",textField_4.getText()};
 				try {
-					guardar.GuardarData(strings);
 					
-				} catch (IOException e1) {
+					Connection conexion = Conexion.obtener();
+					String query = "INSERT INTO user (cod_user, dni, nom, fechNac, nomUser, clave, rol) VALUES (null, '"+textField.getText()+"', '"+textField_1.getText()+"', '"+textField_2.getText()+"', '"+textField_3.getText()+"', '"+textField_4.getText()+"', '0')";
+					Statement stmt = conexion.createStatement();
+					stmt.executeUpdate(query);
 					
-					e1.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 				
 				EventQueue.invokeLater(new Runnable() {
@@ -237,11 +249,36 @@ public class Registro extends JFrame{
 				
 			}
 		});
+		
+		lblNewLabel_5 = new JLabel("Repite Contrase\u00F1a");
+		GridBagConstraints gbc_lblNewLabel_5 = new GridBagConstraints();
+		gbc_lblNewLabel_5.anchor = GridBagConstraints.WEST;
+		gbc_lblNewLabel_5.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel_5.gridx = 1;
+		gbc_lblNewLabel_5.gridy = 11;
+		contentPane.add(lblNewLabel_5, gbc_lblNewLabel_5);
+		
+		textField_5 = new JTextField();
+		textField_5.setColumns(10);
+		GridBagConstraints gbc_textField_5 = new GridBagConstraints();
+		gbc_textField_5.gridwidth = 2;
+		gbc_textField_5.insets = new Insets(0, 0, 5, 5);
+		gbc_textField_5.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_5.gridx = 3;
+		gbc_textField_5.gridy = 11;
+		contentPane.add(textField_5, gbc_textField_5);
+		
+		separator_9 = new JSeparator();
+		GridBagConstraints gbc_separator_9 = new GridBagConstraints();
+		gbc_separator_9.insets = new Insets(0, 0, 5, 5);
+		gbc_separator_9.gridx = 1;
+		gbc_separator_9.gridy = 12;
+		contentPane.add(separator_9, gbc_separator_9);
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.anchor = GridBagConstraints.WEST;
 		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
 		gbc_btnNewButton.gridx = 3;
-		gbc_btnNewButton.gridy = 11;
+		gbc_btnNewButton.gridy = 13;
 		contentPane.add(btnNewButton, gbc_btnNewButton);
 		
 		btnVolver = new JButton("Volver");
@@ -267,7 +304,7 @@ public class Registro extends JFrame{
 		gbc_btnVolver.anchor = GridBagConstraints.EAST;
 		gbc_btnVolver.insets = new Insets(0, 0, 0, 5);
 		gbc_btnVolver.gridx = 4;
-		gbc_btnVolver.gridy = 11;
+		gbc_btnVolver.gridy = 13;
 		contentPane.add(btnVolver, gbc_btnVolver);
 	}
 	

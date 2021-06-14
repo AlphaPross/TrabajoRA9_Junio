@@ -7,6 +7,10 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,15 +21,16 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import Guardar.Leer;
 import VerCitas.VerCitas;
+import services.Conexion;
 
 public class GestionMedicos extends JFrame{
 	
 	private JPanel contentPane;
 	private JTable table;
+	String [][] list = new String [99][99];
 
-	public GestionMedicos() throws IOException {
+	public GestionMedicos() throws IOException, ClassNotFoundException, SQLException {
 		setTitle("Gesti\u00F3n M\u00E9dicos");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
@@ -43,18 +48,110 @@ public class GestionMedicos extends JFrame{
 		JButton btnNewButton_2 = new JButton("Actualizar");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						
+						String dato=String.valueOf(table.getValueAt(table.getSelectedRow(),0));
+						
+						try {	
+							
+							Connection conexion = Conexion.obtener();
+							String query = "UPDATE med SET nom='"+table.getValueAt(table.getSelectedRow(),1)+"', foto='"+table.getValueAt(table.getSelectedRow(),2)+"', dirección='"+table.getValueAt(table.getSelectedRow(),3)+"' WHERE cod_med="+dato;
+							Statement stmt = conexion.createStatement();
+							stmt.executeUpdate(query);
+							
+						} catch (ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						try {
+							GestionMedicos frame = new GestionMedicos();
+							frame.setVisible(true);
+							frame.setLocationRelativeTo(null);
+							setVisible(false);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				
 			}
 		});
 		
 		JButton btnNewButton_1 = new JButton("Eliminar");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
+				String dato=String.valueOf(table.getValueAt(table.getSelectedRow(),0));
+				
+				try {	
+					
+					Connection conexion = Conexion.obtener();
+					String query = "DELETE FROM med WHERE cod_med="+dato;
+					Statement stmt = conexion.createStatement();
+					stmt.executeUpdate(query);
+					
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							GestionMedicos frame = new GestionMedicos();
+							frame.setVisible(true);
+							frame.setLocationRelativeTo(null);
+							setVisible(false);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				
 			}
 		});
 		
 		JButton btnNewButton = new JButton("Insertar");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
+				try {	
+					
+					Connection conexion = Conexion.obtener();
+					String query = "INSERT INTO med (cod_med, nom, foto, dirección) VALUES (null, '"+table.getValueAt(table.getSelectedRow(),1)+"', '"+table.getValueAt(table.getSelectedRow(),2)+"', '"+table.getValueAt(table.getSelectedRow(),3)+"')";
+					Statement stmt = conexion.createStatement();
+					stmt.executeUpdate(query);
+					
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							GestionMedicos frame = new GestionMedicos();
+							frame.setVisible(true);
+							frame.setLocationRelativeTo(null);
+							setVisible(false);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				
 			}
 		});
 		
@@ -82,10 +179,37 @@ public class GestionMedicos extends JFrame{
 		gbc_scrollPane.gridy = 2;
 		contentPane.add(scrollPane, gbc_scrollPane);
 		
-		Leer leer = new Leer();
+		//Conexion con = new Conexion();
+		Connection conexion = Conexion.obtener();
+		
+		String sql = "SELECT * FROM med";
+		
+		Statement statement;
+		
+		try {
+			statement = conexion.createStatement();
+			
+			ResultSet result = statement.executeQuery(sql);
+			
+			int i=0;
+			
+			while (result.next()) {
+				list[i][0]=result.getString(1);
+				list[i][1]=result.getString(2);
+				list[i][2]=result.getString(3);
+				list[i][3]=result.getString(4);
+				i++;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		//conexion.close();
+		
+		//Leer leer = new Leer();
 		table = new JTable();
-		table.setModel(new DefaultTableModel(leer.LeerData(),
-				new String[] { "Username", "Nombre", "Tel\u00E9fono", "Email", "Coches Totales" }));
+		table.setModel(new DefaultTableModel(list,
+				new String[] { "cod_med", "Nombre Completo", "Foto", "Dirección"}));
 		scrollPane.setViewportView(table);
 		
 		JSeparator separator_4 = new JSeparator();
