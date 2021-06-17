@@ -4,14 +4,23 @@ import java.awt.EventQueue;
 import services.Conexion;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -24,7 +33,7 @@ public class Login extends JFrame{
 
 	private JPanel contentPane;
 	private JTextField textField;
-	private JTextField textField_1;
+	private JPasswordField passwordField;
 	
 	public static void main(String[] args) {
 		
@@ -42,8 +51,9 @@ public class Login extends JFrame{
 
 	}
 	
-	public Login() {
-		setTitle("Pantalla Principal");
+	public Login() throws IOException, ClassNotFoundException, SQLException{
+		setIconImage(Toolkit.getDefaultToolkit().getImage("resources/hospital.png"));
+		setTitle("Login");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 500, 210);
 		contentPane = new JPanel();
@@ -110,15 +120,15 @@ public class Login extends JFrame{
 		gbc_lblNewLabel_1.gridy = 4;
 		contentPane.add(lblNewLabel_1, gbc_lblNewLabel_1);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
+		passwordField = new JPasswordField();
+		passwordField.setColumns(10);
 		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
 		gbc_textField_1.gridwidth = 2;
 		gbc_textField_1.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField_1.gridx = 4;
 		gbc_textField_1.gridy = 4;
-		contentPane.add(textField_1, gbc_textField_1);
+		contentPane.add(passwordField, gbc_textField_1);
 		
 		JSeparator separator_4 = new JSeparator();
 		GridBagConstraints gbc_separator_4 = new GridBagConstraints();
@@ -134,30 +144,51 @@ public class Login extends JFrame{
 		gbc_separator_5.gridy = 7;
 		contentPane.add(separator_5, gbc_separator_5);
 		
+		String sql = "SELECT nomUser, clave FROM user";
+
+		Connection conexion = Conexion.obtener();
+		Statement statement;
+		statement = conexion.createStatement();
+		ResultSet result = statement.executeQuery(sql);
+		
+		String [] list = new String [99];
+		int i=0;
+		
+		while (result.next()) {
+			list[i] = result.getString(1);
+			i++;
+			list[i] = result.getString(2);
+			i++;
+		}
+		
 		JButton btnNewButton = new JButton("Login");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
-				if (textField.getText().equals("admin") && textField_1.getText().equals("admin")) {
-					EventQueue.invokeLater(new Runnable() {
-						public void run() {
-							try {
-								GestionMedicos frame = new GestionMedicos();
-								frame.setVisible(true);
-								frame.setLocationRelativeTo(null);
-								setVisible(false);
-							} catch (Exception e) {
-								e.printStackTrace();
+				for (int j = 2; j < list.length; j++) {	
+				
+					if (textField.getText().equals(list[j]) && passwordField.getText().equals(list[j+1])) {
+						EventQueue.invokeLater(new Runnable() {
+							public void run() {
+								try {
+									GestionCitas frame = new GestionCitas(textField.getText());
+									frame.setVisible(true);
+									frame.setLocationRelativeTo(null);
+									setVisible(false);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 							}
-						}
-					});
+						});
+					}
+					
 				}
 				
-				if (textField.getText().equals("user") && textField_1.getText().equals("user")) {
+				if (textField.getText().equals(list[0]) && passwordField.getText().equals(list[1])) {
 					EventQueue.invokeLater(new Runnable() {
 						public void run() {
 							try {
-								GestionCitas frame = new GestionCitas();
+								GestionMedicos frame = new GestionMedicos(textField.getText());
 								frame.setVisible(true);
 								frame.setLocationRelativeTo(null);
 								setVisible(false);
@@ -166,6 +197,8 @@ public class Login extends JFrame{
 							}
 						}
 					});
+				}else {
+					JOptionPane.showMessageDialog(null,"El Usuario o Contraseña introducidos no son correctos","Error de login",JOptionPane.ERROR_MESSAGE);
 				}
 				
 			}

@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -15,7 +16,9 @@ import java.sql.Statement;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -30,7 +33,7 @@ public class Registro extends JFrame{
 	private JTextField textField_1;
 	private JTextField textField_2;
 	private JTextField textField_3;
-	private JTextField textField_4;
+	private JPasswordField passwordField;
 	private JButton btnNewButton;
 	private JButton btnVolver;
 	private JSeparator separator;
@@ -43,11 +46,12 @@ public class Registro extends JFrame{
 	private JSeparator separator_7;
 	private JSeparator separator_8;
 	private JSeparator separator_9;
-	private JTextField textField_5;
+	private JPasswordField passwordField2;
 	private JLabel lblNewLabel_5;
 	private JPanel contentPane;
 	
 	public Registro() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("resources/hospital.png"));
 		setTitle("Registro Usuario");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
@@ -198,15 +202,15 @@ public class Registro extends JFrame{
 		gbc_lblNewLabel_4.gridy = 9;
 		contentPane.add(lblNewLabel_4, gbc_lblNewLabel_4);
 		
-		textField_4 = new JTextField();
+		passwordField = new JPasswordField();
 		GridBagConstraints gbc_textField_4 = new GridBagConstraints();
 		gbc_textField_4.gridwidth = 2;
 		gbc_textField_4.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_4.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField_4.gridx = 3;
 		gbc_textField_4.gridy = 9;
-		contentPane.add(textField_4, gbc_textField_4);
-		textField_4.setColumns(10);
+		contentPane.add(passwordField, gbc_textField_4);
+		passwordField.setColumns(10);
 		
 		separator_5 = new JSeparator();
 		GridBagConstraints gbc_separator_5 = new GridBagConstraints();
@@ -219,33 +223,60 @@ public class Registro extends JFrame{
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
-				try {
-					
-					Connection conexion = Conexion.obtener();
-					String query = "INSERT INTO user (cod_user, dni, nom, fechNac, nomUser, clave, rol) VALUES (null, '"+textField.getText()+"', '"+textField_1.getText()+"', '"+textField_2.getText()+"', '"+textField_3.getText()+"', '"+textField_4.getText()+"', '0')";
-					Statement stmt = conexion.createStatement();
-					stmt.executeUpdate(query);
-					
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (validarDNI(textField.getText())==false) {
+					JOptionPane.showMessageDialog(null,"El DNI está mal escrito formato: 45637283Z","Error de DNI",JOptionPane.ERROR_MESSAGE);
 				}
 				
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						try {
-							GestionCitas frame = new GestionCitas();
-							frame.setVisible(true);
-							frame.setLocationRelativeTo(null);
-							setVisible(false);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+				if (validarNombre(textField_1.getText())==false) {
+					JOptionPane.showMessageDialog(null,"El Nombre está mal escrito formato: Juan","Error de Nombre",JOptionPane.ERROR_MESSAGE);
+				}
+				
+				if (validarFecha(textField_2.getText())==false) {
+					JOptionPane.showMessageDialog(null,"La Fecha está mal escrita formato: 1999-01-19","Error de Fecha",JOptionPane.ERROR_MESSAGE);
+				}
+				
+				if (validarUserContraseña(textField_3.getText())==false||validarUserContraseña(passwordField.getText())==false) {
+					JOptionPane.showMessageDialog(null,"El Nombre o Contraseña estan mal escritos formato:\nuser: pross\ncontraseña: contra","Error de User o Contraseña",JOptionPane.ERROR_MESSAGE);
+				}
+				
+				if (passwordField.getText().equals(passwordField2.getText()) && validarDNI(textField.getText())==true
+																			 && validarFecha(textField_2.getText())==true
+																			 && validarNombre(textField_1.getText())==true
+																			 && validarUserContraseña(textField_3.getText())==true
+																			 && validarUserContraseña(passwordField.getText())==true) {
+					try {
+						
+						Connection conexion = Conexion.obtener();
+						String query = "INSERT INTO user (cod_user, dni, nom, fechNac, nomUser, clave, rol) VALUES (null, '"
+									+textField.getText()+"', '"
+									+textField_1.getText()+"', '"
+									+textField_2.getText()+"', '"
+									+textField_3.getText()+"', '"
+									+passwordField.getText()+"', '0')";
+						Statement stmt = conexion.createStatement();
+						stmt.executeUpdate(query);
+						
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				});
+					
+					EventQueue.invokeLater(new Runnable() {
+						public void run() {
+							try {
+								GestionCitas frame = new GestionCitas(textField_3.getText());
+								frame.setVisible(true);
+								frame.setLocationRelativeTo(null);
+								setVisible(false);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					});
+				}
 				
 			}
 		});
@@ -258,15 +289,15 @@ public class Registro extends JFrame{
 		gbc_lblNewLabel_5.gridy = 11;
 		contentPane.add(lblNewLabel_5, gbc_lblNewLabel_5);
 		
-		textField_5 = new JTextField();
-		textField_5.setColumns(10);
+		passwordField2 = new JPasswordField();
+		passwordField2.setColumns(10);
 		GridBagConstraints gbc_textField_5 = new GridBagConstraints();
 		gbc_textField_5.gridwidth = 2;
 		gbc_textField_5.insets = new Insets(0, 0, 5, 5);
 		gbc_textField_5.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField_5.gridx = 3;
 		gbc_textField_5.gridy = 11;
-		contentPane.add(textField_5, gbc_textField_5);
+		contentPane.add(passwordField2, gbc_textField_5);
 		
 		separator_9 = new JSeparator();
 		GridBagConstraints gbc_separator_9 = new GridBagConstraints();
@@ -306,6 +337,27 @@ public class Registro extends JFrame{
 		gbc_btnVolver.gridx = 4;
 		gbc_btnVolver.gridy = 13;
 		contentPane.add(btnVolver, gbc_btnVolver);
+		
+	}
+	
+	public static boolean validarDNI(String nom) {
+		return nom.matches("^[0-9]{8,8}[A-Za-z]$");
+		
+	}
+	
+	public static boolean validarNombre(String nom) {
+		return nom.matches("[A-Z][a-zA-Z]*");
+		
+	}
+	
+	public static boolean validarFecha(String nom) {
+		return nom.matches("^\\d{4}-\\d{2}-\\d{2}$");
+		
+	}
+	
+	public static boolean validarUserContraseña(String nom) {
+		return nom.matches("^[a-z0-9_-]{5,15}$");
+		
 	}
 	
 }

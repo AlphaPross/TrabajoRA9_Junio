@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -30,7 +31,8 @@ public class GestionCitas extends JFrame {
 	private JTable table;
 	private String[][] list=new String[99][99];
 
-	public GestionCitas() throws IOException, ClassNotFoundException, SQLException {
+	public GestionCitas(String nom) throws IOException, ClassNotFoundException, SQLException {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("resources/hospital.png"));
 		setTitle("Gesti\u00F3n Citas");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -68,9 +70,31 @@ public class GestionCitas extends JFrame {
 		gbc_scrollPane.gridy = 2;
 		contentPane.add(scrollPane, gbc_scrollPane);
 
-		Connection conexion = Conexion.obtener();
+		String sql2 = "SELECT nomUser, clave FROM user";
 
+		Connection conexion2 = Conexion.obtener();
+		Statement statement2;
+		statement2 = conexion2.createStatement();
+		ResultSet result2 = statement2.executeQuery(sql2);
+		
+		String [] list2 = new String [99];
+		int l=0;
+		
+		while (result2.next()) {
+			list2[l] = result2.getString(1);
+			l++;
+			list2[l] = result2.getString(2);
+			l++;
+		}
 		int cod_user = 1;
+		
+		for (int j = 3; j < list2.length; j++) {
+			if (list2[j]==nom) {
+				cod_user=j;
+			}
+		}
+		
+		Connection conexion = Conexion.obtener();
 
 		String sql = "SELECT cod_cita, cod_user, cod_med, resumen, fecha, realizada FROM cita WHERE cod_user = "+cod_user+" ORDER BY fecha ASC";
 
@@ -100,7 +124,15 @@ public class GestionCitas extends JFrame {
 		// Leer leer = new Leer();
 		table = new JTable();
 		table.setModel(new DefaultTableModel(list,
-				new String[] { "cod_cita", "cod_user", "cod_médico", "Resumen", "Fecha", "Realizado" }));
+				new String[] { "cod_cita", "cod_user", "cod_médico", "Resumen", "Fecha", "Realizado" })
+		{
+			boolean[] columnEditables = new boolean[] {
+					false, false, false, true, true, false
+				};
+				public boolean isCellEditable(int row, int column) {
+					return columnEditables[column];
+				}
+		});
 		scrollPane.setViewportView(table);
 
 		JSeparator separator_1 = new JSeparator();
@@ -123,26 +155,33 @@ public class GestionCitas extends JFrame {
 				
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
-						
-						String dato=String.valueOf(table.getValueAt(table.getSelectedRow(),0));
-						
-						try {	
-							
-							Connection conexion = Conexion.obtener();
-							String query = "UPDATE cita SET resumen='"+table.getValueAt(table.getSelectedRow(),3)+"', fecha='"+table.getValueAt(table.getSelectedRow(),4)+"'";
-							Statement stmt = conexion.createStatement();
-							stmt.executeUpdate(query);
-							
-						} catch (ClassNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (SQLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						if (table.getValueAt(table.getSelectedRow(),0)!=null) {
+							String dato=String.valueOf(table.getValueAt(table.getSelectedRow(),0));
+							if (dato!=null) {
+								try {	
+									
+									Connection conexion = Conexion.obtener();
+									String query = "INSERT INTO med (cod_med, nom, foto, dirección) VALUES (null, null, null, '"
+											+table.getValueAt(table.getSelectedRow(),3)+"', '"
+											+table.getValueAt(table.getSelectedRow(),4)+"', null)";
+									Statement stmt = conexion.createStatement();
+									stmt.executeUpdate(query);
+									
+								} catch (ClassNotFoundException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (SQLException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
 						}
 						
+						
+						
+						
 						try {
-							GestionCitas frame = new GestionCitas();
+							GestionCitas frame = new GestionCitas(nom);
 							frame.setVisible(true);
 							frame.setLocationRelativeTo(null);
 							setVisible(false);
@@ -185,7 +224,7 @@ public class GestionCitas extends JFrame {
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						try {
-							GestionCitas frame = new GestionCitas();
+							GestionCitas frame = new GestionCitas(nom);
 							frame.setVisible(true);
 							frame.setLocationRelativeTo(null);
 							setVisible(false);

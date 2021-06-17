@@ -3,6 +3,7 @@ package InformeFinal;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -34,6 +35,7 @@ public class InformeFinal extends JFrame {
 	private String[][] list = new String[99][99];
 
 	public InformeFinal() throws IOException, SQLException, ClassNotFoundException {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("resources/hospital.png"));
 		setTitle("Informe Final");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -120,7 +122,15 @@ public class InformeFinal extends JFrame {
 		
 		// Leer leer = new Leer();
 		table = new JTable();
-		table.setModel(new DefaultTableModel(list1, new String[] { "Nombre Médico", "Media citas/dia" }));
+		table.setModel(new DefaultTableModel(list1, new String[] { "Nombre Médico", "Media citas/dia" })
+		{
+			boolean[] columnEditables = new boolean[] {
+				false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
 		scrollPane.setViewportView(table);
 
 		JSeparator separator_2 = new JSeparator();

@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -30,7 +31,8 @@ public class GestionMedicos extends JFrame{
 	private JTable table;
 	String [][] list = new String [99][99];
 
-	public GestionMedicos() throws IOException, ClassNotFoundException, SQLException {
+	public GestionMedicos(String nom) throws IOException, ClassNotFoundException, SQLException {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("resources/hospital.png"));
 		setTitle("Gesti\u00F3n M\u00E9dicos");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
@@ -70,7 +72,7 @@ public class GestionMedicos extends JFrame{
 						}
 						
 						try {
-							GestionMedicos frame = new GestionMedicos();
+							GestionMedicos frame = new GestionMedicos(nom);
 							frame.setVisible(true);
 							frame.setLocationRelativeTo(null);
 							setVisible(false);
@@ -107,7 +109,7 @@ public class GestionMedicos extends JFrame{
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						try {
-							GestionMedicos frame = new GestionMedicos();
+							GestionMedicos frame = new GestionMedicos(nom);
 							frame.setVisible(true);
 							frame.setLocationRelativeTo(null);
 							setVisible(false);
@@ -127,7 +129,10 @@ public class GestionMedicos extends JFrame{
 				try {	
 					
 					Connection conexion = Conexion.obtener();
-					String query = "INSERT INTO med (cod_med, nom, foto, dirección) VALUES (null, '"+table.getValueAt(table.getSelectedRow(),1)+"', '"+table.getValueAt(table.getSelectedRow(),2)+"', '"+table.getValueAt(table.getSelectedRow(),3)+"')";
+					String query = "INSERT INTO med (cod_med, nom, foto, dirección) VALUES (null, '"
+									+table.getValueAt(table.getSelectedRow(),1)+"', '"
+									+table.getValueAt(table.getSelectedRow(),2)+"', '"
+									+table.getValueAt(table.getSelectedRow(),3)+"')";
 					Statement stmt = conexion.createStatement();
 					stmt.executeUpdate(query);
 					
@@ -142,7 +147,7 @@ public class GestionMedicos extends JFrame{
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						try {
-							GestionMedicos frame = new GestionMedicos();
+							GestionMedicos frame = new GestionMedicos(nom);
 							frame.setVisible(true);
 							frame.setLocationRelativeTo(null);
 							setVisible(false);
@@ -179,7 +184,6 @@ public class GestionMedicos extends JFrame{
 		gbc_scrollPane.gridy = 2;
 		contentPane.add(scrollPane, gbc_scrollPane);
 		
-		//Conexion con = new Conexion();
 		Connection conexion = Conexion.obtener();
 		
 		String sql = "SELECT * FROM med";
@@ -209,7 +213,15 @@ public class GestionMedicos extends JFrame{
 		//Leer leer = new Leer();
 		table = new JTable();
 		table.setModel(new DefaultTableModel(list,
-				new String[] { "cod_med", "Nombre Completo", "Foto", "Dirección"}));
+				new String[] { "cod_med", "Nombre Completo", "Foto", "Dirección"})
+		{
+			boolean[] columnEditables = new boolean[] {
+					false, true, true, true
+				};
+				public boolean isCellEditable(int row, int column) {
+					return columnEditables[column];
+				}
+			});
 		scrollPane.setViewportView(table);
 		
 		JSeparator separator_4 = new JSeparator();

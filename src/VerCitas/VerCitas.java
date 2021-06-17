@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class VerCitas extends JFrame {
 	private String[][] list = new String[99][99];
 
 	public VerCitas() throws IOException, SQLException, ClassNotFoundException {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("resources/hospital.png"));
 		setTitle("Ver Citas");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
@@ -98,7 +100,15 @@ public class VerCitas extends JFrame {
 		
 		table = new JTable();
 		table.setModel(new DefaultTableModel(list,
-				new String[] { "Cod_Cita", "Cod_Usuario", "Cod_Médico", "Resumen", "Fecha", "Realizada" }));
+				new String[] { "Cod_Cita", "Cod_Usuario", "Cod_Médico", "Resumen", "Fecha", "Realizada" })
+		{
+			boolean[] columnEditables = new boolean[] {
+				false, false, false, true, true, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
 		scrollPane.setViewportView(table);
 
 		// conexion.close();
